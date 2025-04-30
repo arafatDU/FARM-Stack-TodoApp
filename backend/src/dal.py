@@ -80,3 +80,79 @@ class ToDoDAL:
       return None
     return ToDoList.from_doc(doc)
   
+  async def delete_todo_list(self, id: str | ObjectId, session=None) -> bool:
+    result = await self._todo_collection.delete_one(
+      {"_id": ObjectId(id)},
+      session=session,
+    )
+    return result.deleted_count == 1
+  
+  
+  async def create_item(
+    self,
+    id: str | ObjectId,
+    label: str,
+    session=None,
+  ) -> ToDoList | None:
+    result = await self._todo_collection.find_one_and_update(
+      {"_id": ObjectId(id)},
+      {
+        "$push": {
+          "items": {
+            "_id": uuid4().hex,
+            "label": label,
+            "checked": False,
+          }
+        }
+      },
+      session=session,
+      return_document=ReturnDocument.AFTER,
+    )
+    if result is None:
+      return None
+    return ToDoList.from_doc(result)
+  
+  
+  async def set_checked_state(
+    self,
+    doc_id: str | ObjectId,
+    item_id: str,
+    checked_state: bool,
+    session=None,
+  ) -> ToDoList | None:
+    result = await self._todo_collection.find_one_and_update(
+      {"_id": ObjectId(doc_id), "items._id": item_id},
+      {
+        "$set": {
+          "items.$.checked": checked_state,
+        }
+      },
+      session=session,
+      return_document=ReturnDocument.AFTER,
+    )
+    if result is None:
+      return None
+    return ToDoList.from_doc(result)
+  
+  
+  async def delete_item(
+    self,
+    doc_id: str | ObjectId,
+    item_id: str,
+    session=None,
+  ) -> ToDoList | None:
+    result = await self._todo_collection.find_one_and_update(
+      {"_id": ObjectId(doc_id)},
+      {
+        "$pull": {
+          "items": {
+            "_id": item_id,
+          }
+        }
+      },
+      session=session,
+      return_document=ReturnDocument.AFTER,
+    )
+    if result is None:
+      return None
+    return ToDoList.from_doc(result)
