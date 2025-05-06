@@ -26,6 +26,13 @@ function TodoList() {
       .catch((error) => console.error('Error updating item:', error));
   };
 
+  const handleAddItem = (newItem) => {
+    setTodoList((prev) => ({
+      ...prev,
+      items: [...prev.items, { ...newItem, label: newItem.label || '', checked: false }],
+    }));
+  };
+
   const handleBack = () => navigate('/');
 
   if (!todoList) {
@@ -38,10 +45,7 @@ function TodoList() {
         Back
       </button>
       <h1 className="text-4xl font-bold text-center text-blue-600 mb-6">{todoList.name}</h1>
-      <AddTodoItemForm listId={id} onAdd={(newItem) => setTodoList((prev) => ({
-        ...prev,
-        items: [...prev.items, newItem],
-      }))} />
+      <AddTodoItemForm listId={id} onAdd={handleAddItem} />
       <ul className="space-y-4">
         {todoList.items.map((item) => (
           <li key={item.id} className="flex items-center space-x-4">
