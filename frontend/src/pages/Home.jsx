@@ -26,7 +26,7 @@ function Home() {
         <input
           type="text"
           placeholder="Search..."
-          className="p-2 rounded w-1/2"
+          className="p-2 rounded w-1/2 bg-gray-200 text-gray-800"
         />
       </nav>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">

@@ -42,31 +42,8 @@ function CreateTodoListForm({ onCreate }) {
         placeholder="Todo List Name"
         className="p-2 border rounded w-full"
       />
-      {items.map((item, index) => (
-        <div key={index} className="flex items-center space-x-2">
-          <input
-            type="text"
-            value={item}
-            onChange={(e) => handleItemChange(index, e.target.value)}
-            placeholder="Todo Item"
-            className="p-2 border rounded flex-1"
-          />
-          <button
-            type="button"
-            onClick={() => handleDeleteItem(index)}
-            className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700"
-          >
-            Delete
-          </button>
-        </div>
-      ))}
-      <button
-        type="button"
-        onClick={handleAddItem}
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-      >
-        Add Item
-      </button>
+
+      
       <button
         type="submit"
         className="bg-green-600 text-white px-4 py-2 rounded w-full hover:bg-green-700"
