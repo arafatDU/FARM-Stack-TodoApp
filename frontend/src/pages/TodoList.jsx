@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import AddTodoItemForm from '../components/AddTodoItemForm';
 import TodoItem from '../components/TodoItem';
 
 function TodoList() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [todoList, setTodoList] = useState(null);
 
   useEffect(() => {
@@ -13,25 +14,44 @@ function TodoList() {
       .then((data) => setTodoList(data));
   }, [id]);
 
-  const handleToggleItem = (updatedList) => {
-    setTodoList(updatedList);
+  // Fixed strike-through and deletion logic
+  const handleToggleItem = (item) => {
+    fetch(`http://localhost:3001/api/lists/${id}/checked_state`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ item_id: item.id, checked_state: !item.checked }),
+    })
+      .then((response) => response.json())
+      .then((updatedList) => setTodoList(updatedList))
+      .catch((error) => console.error('Error updating item:', error));
   };
+
+  const handleBack = () => navigate('/');
 
   if (!todoList) {
     return <div>Loading...</div>;
   }
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">{todoList.name}</h1>
+    <div className="max-w-7xl mx-auto">
+      <button onClick={handleBack} className="mb-4 bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">
+        Back
+      </button>
+      <h1 className="text-4xl font-bold text-center text-blue-600 mb-6">{todoList.name}</h1>
       <AddTodoItemForm listId={id} onAdd={(newItem) => setTodoList((prev) => ({
         ...prev,
         items: [...prev.items, newItem],
       }))} />
       <ul className="space-y-4">
         {todoList.items.map((item) => (
-          <li key={item.id}>
-            <TodoItem item={{ ...item, listId: id }} onToggle={handleToggleItem} />
+          <li key={item.id} className="flex items-center space-x-4">
+            <input
+              type="checkbox"
+              checked={item.checked}
+              onChange={() => handleToggleItem(item)}
+              className="w-5 h-5"
+            />
+            <span className={item.checked ? 'line-through text-gray-500' : ''}>{item.label}</span>
           </li>
         ))}
       </ul>
